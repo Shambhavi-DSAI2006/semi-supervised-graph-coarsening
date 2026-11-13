@@ -24,9 +24,9 @@ NOISE = ["0.05", "0.1", "0.15", "0.2"]
 def get(exp, ds, setting, epochs):
     m = [r for r in R if r["experiment"] == exp and r["dataset"] == ds
          and r["setting"] == setting and r["epochs"] == epochs]
-    if len(m) != 1:
-        raise KeyError(f"expected one result for {exp}/{ds}/{setting}/{epochs}, found {len(m)}")
-    return m[0]
+    if not m:
+        raise KeyError(f"no result for {exp}/{ds}/{setting}/{epochs}; run it with repro.py first")
+    return m[-1]  # reruns append to results.jsonl; the newest entry wins
 
 
 def pm(r):
