@@ -11,6 +11,6 @@ __pycache__/
 venv/
 
 # Logs and checkpoints
-results/*.log
+**/results/*.log
 *.pt
 .DS_Store

@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 sgbgc-reproduction contributors
+Copyright (c) 2026 Shambhavi
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,4 +22,4 @@ SOFTWARE.
 
 Note: this license covers only the files in this repository. The original SGBGC
 code (https://github.com/mxjun17/GBNC) is not included and is fetched separately
-by scripts/setup.sh; it is subject to its authors' terms.
+by reproduction/scripts/setup.sh; it is subject to its authors' terms.

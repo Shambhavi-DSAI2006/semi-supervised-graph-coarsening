@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fetch the authors' SGBGC code at the exact commit used for this reproduction,
-# and pre-download the datasets. Run from the repository root:  bash scripts/setup.sh
+# and pre-download the datasets. Run from the reproduction/ folder:  bash scripts/setup.sh
 set -euo pipefail
 
 GBNC_URL="https://github.com/mxjun17/GBNC"

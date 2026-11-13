@@ -1,4 +1,4 @@
-# sgbgc-reproduction
+# Stage 1 - Reproducing SGBGC
 
 Independent reproduction of **SGBGC** from *Graph Coarsening via Supervised Granular-Ball for Scalable Graph Neural Network Training* (Xia et al., AAAI-25), using the authors' released code ([mxjun17/GBNC](https://github.com/mxjun17/GBNC)) on **Cora, Citeseer and Co-CS**.
 
@@ -80,7 +80,8 @@ Baseline methods (no code released), speed-ups over baselines (Fig. 3), memory u
 ## How to reproduce
 
 ```bash
-git clone <this-repo-url> sgbgc-reproduction && cd sgbgc-reproduction
+git clone https://github.com/Shambhavi-DSAI2006/semi-supervised-graph-coarsening.git
+cd semi-supervised-graph-coarsening/reproduction
 pip install -r requirements.txt
 bash scripts/setup.sh                      # fetches the authors' code (commit a60c882) and Co-CS data
 

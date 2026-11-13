@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Run every experiment in the reproduction. Run from the repository root:
+# Run every experiment in the reproduction. Run from the reproduction/ folder:
 #   bash scripts/run_all.sh            # both epoch settings (as reported)
 #   EPOCHS="60" bash scripts/run_all.sh  # code-default setting only (faster)
 # Results are appended to results/results.jsonl; progress goes to results/run.log.

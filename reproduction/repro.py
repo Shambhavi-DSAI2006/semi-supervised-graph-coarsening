@@ -13,7 +13,7 @@ Experiments
   full     : GCN on the uncoarsened graph             (paper Table 2 "FULL")
   noise    : label noise on training nodes            (paper Fig. 4)
 
-Usage (from the repository root, so datasets land in ./dataset):
+Usage (from the reproduction/ folder, so datasets land in ./dataset):
   python repro.py <experiment> <dataset> [ratio|noise_rate ...] [--epochs N] [--runs N]
   e.g. python repro.py table1 cora 0.5 0.3 0.1 --epochs 60
 Writes one JSON line per configuration to results/results.jsonl
