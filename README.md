@@ -15,7 +15,7 @@ Real graphs are usually labelled sparsely; standard semi-supervised benchmarks g
 | Stage | Goal | Status |
 |---|---|---|
 | 1. Reproduce | Reproduce SGBGC's main results with the authors' code | Done: [reproduction/](reproduction/) |
-| 2. Diagnose | Measure how label-aware coarsening behaves as labels become scarce | Planned |
+| 2. Diagnose | Measure how label-aware coarsening behaves as labels become scarce | Done: **pivot** - [`stage2/`](stage2/) |
 | 3. Method | Design a coarsening method that uses sparse labels and unlabelled structure | Planned |
 | 4. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
 
@@ -23,9 +23,14 @@ Real graphs are usually labelled sparsely; standard semi-supervised benchmarks g
 
 SGBGC's results reproduce on Cora, Citeseer and Co-CS, but only with the code's default of 60 training epochs rather than the 200 stated in the paper. Full results, deviations and instructions: [reproduction/README.md](reproduction/README.md).
 
+## Stage 2 at a glance
+
+Pre-registered test on Cora and Citeseer at 5-20 labels per class. SGBGC's collapse under label scarcity comes from discarding unlabelled nodes; keeping them recovers 4-7 points. But once nothing is discarded, label-aware coarsening is no better than label-free coarsening (Loukas/SCAL) with the same training, so the pre-registered rule says **pivot**: the project needs a different angle on semi-supervised coarsening. Details and candidate directions: [`stage2/README.md`](stage2/README.md).
+
 ## Repository layout
 
 - **reproduction/**: Stage 1, the SGBGC reproduction (scripts, raw results, tables, figures)
+- **stage2/**: Stage 2, the label-scarcity test (protocol, log, code, results)
 
 ## Key references
 
