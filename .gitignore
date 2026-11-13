@@ -1,0 +1,16 @@
+# Authors' code (cloned by scripts/setup.sh, not redistributed here)
+GBNC/
+
+# Datasets downloaded by PyTorch Geometric
+dataset/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Logs and checkpoints
+results/*.log
+*.pt
+.DS_Store
