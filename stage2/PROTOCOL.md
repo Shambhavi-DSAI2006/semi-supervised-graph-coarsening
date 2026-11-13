@@ -99,4 +99,18 @@ H1 is reported as supported (gap ≥ 2), refuted (gap ≤ 1) or unclear, but doe
 
 ## Amendments
 
-*(none yet)*
+### Amendment 1 — equal super-node budgets (2026-11-13, before any test-set result)
+
+**Reason.** A development run (seed 99, validation accuracy only, test accuracy not computed or stored) showed that the methods did not produce comparable numbers of super-nodes:
+
+- Citeseer has 430 connected components of ≤ 10 nodes (1,109 nodes); Cora has 76 (197 nodes). At ratio 0.1 Citeseer's budget is 332 super-nodes, fewer than its number of components, so connectivity-respecting methods could not meet it without deleting nodes.
+- Following SCAL, Loukas (M4) left small components uncoarsened, giving 952 instead of 812 super-nodes on Cora at ratio 0.3 and 450 instead of 270 at 0.1.
+- The k search for feature clustering (M6) assumed the super-node count grows monotonically with k; it does not, and the search stopped at 152 instead of 270 super-nodes on Cora at ratio 0.1.
+
+**Change.**
+
+1. For M3–M6, every connected component with ≤ 10 nodes (including isolated nodes) becomes **one super-node**, identically for all four methods. The coarsening method runs on the subgraph of the remaining (large) components, and the ratio is applied to that subgraph's nodes. M2 (SGBGC as released) is unchanged.
+2. M4 therefore no longer keeps small components uncoarsened; this departs from SCAL's code in that one respect.
+3. M6 chooses the k whose final super-node count is closest to the target (search over k plus a local scan), instead of the largest k below the target.
+
+**Resulting budgets** (super-nodes; development run): Cora 829 / 327 and Citeseer 1,095 / 651 at ratios 0.3 / 0.1 for M3 and M5. M4 and M6 come within +4.5% of these (largest gap: Citeseer at ratio 0.1, M6 680 and M4 674 vs 651), because they cannot always hit the count exactly. Extra super-nodes favour the label-free methods, so this makes a "Go" outcome harder, not easier. Achieved counts are recorded for every run.
