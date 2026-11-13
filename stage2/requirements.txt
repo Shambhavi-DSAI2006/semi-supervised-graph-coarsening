@@ -1,0 +1,4 @@
+# Stage 2, in addition to reproduction/requirements.txt
+pygsp==0.5.1          # used by the Loukas coarsening library
+sortedcontainers
+scikit-learn==1.9.1

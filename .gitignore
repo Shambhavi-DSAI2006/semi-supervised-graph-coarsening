@@ -14,3 +14,8 @@ venv/
 **/results/*.log
 *.pt
 .DS_Store
+
+# Stage 2
+stage2/third_party/
+stage2/results/smoke.jsonl
+stage2/dataset
