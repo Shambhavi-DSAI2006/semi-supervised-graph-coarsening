@@ -16,9 +16,6 @@ import data as D
 import coarsen as Cz
 import train as T
 
-torch.set_num_threads(max(1, os.cpu_count() or 1))
-
-
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--datasets", nargs="+", default=["cora", "citeseer"])
@@ -27,12 +24,15 @@ def main():
     ap.add_argument("--methods", nargs="+", default=["full"] + Cz.COARSE_METHODS)
     ap.add_argument("--seeds", nargs="+", type=int, default=list(range(10)))
     ap.add_argument("--smoke", action="store_true")
+    ap.add_argument("--threads", type=int, default=os.cpu_count() or 1)
+    ap.add_argument("--out", default=None, help="results file (default results/results.jsonl)")
     a = ap.parse_args()
+    torch.set_num_threads(max(1, a.threads))
     if a.smoke:
         a.seeds = [99]
 
     os.makedirs("results", exist_ok=True)
-    out = os.path.join("results", "smoke.jsonl" if a.smoke else "results.jsonl")
+    out = a.out or os.path.join("results", "smoke.jsonl" if a.smoke else "results.jsonl")
     label_free_cache = {}                      # deterministic label-free partitions
 
     for ds in a.datasets:
