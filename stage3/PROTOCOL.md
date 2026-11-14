@@ -76,4 +76,17 @@ For each of the 12 (dataset, ratio) cells, compute H and G with 95% confidence i
 
 ## Amendments
 
-*(none yet)*
+### Amendment 1 — a second oracle and a node-keeping fix (2026-11-14, before any test-set result)
+
+**Reason.** A development run (seed 99; validation accuracy only; test accuracy never computed or stored) showed two problems:
+
+1. **The oracle as defined is not an upper bound.** With 20 labels per class, SGBGC-keep spends its splits separating training nodes of different classes, so each training label stays a separate training example on the coarse graph. The oracle instead spends its splits on impurities among the ~1,000–12,000 pool labels, so training nodes get merged: on Cora at ratio 0.1 the oracle had 73 super-nodes carrying a training label against 101 for SGBGC-keep. Fewer training examples can lower accuracy for reasons unrelated to how well labels guide coarsening, which could produce "no headroom" for the wrong reason.
+2. **The oracle deleted nodes at small budgets.** With many labels, SGBGC starts with more initial balls than a 2% budget allows, and the authors' pruning step deletes the smallest balls (19 Cora nodes at ratio 0.02), breaking the keep-every-node rule.
+
+**Change.**
+
+1. **Add a second oracle, O-sep:** purity splitting first on the 20-per-class training labels, exactly as SGBGC-keep does, then — after relabelling every node with its label-pool label — purity splitting continues on the pool labels until the budget is reached. O-sep has strictly more information than SGBGC-keep and keeps the same separation of training nodes (100 vs 101 training-labelled super-nodes in the development run).
+2. **The oracle used in the decision rule is the better of O and O-sep** in each cell (higher mean test accuracy). H = best oracle − best label-free; G = best oracle − SGBGC-keep. Choosing the better oracle per cell slightly favours "target found"; the requirement that the CI lower bound of H be above 0 is kept.
+3. **Keep-every-node fix:** in SGBGC-keep (and both oracles), nodes deleted by the authors' pruning step are reattached to the ball of their nearest covered node (multi-source BFS). This step never triggered in Stage 2; a regression check confirmed that the changed code reproduces the Stage 2 partitions exactly (18 of 18 cases).
+
+**Resulting size:** 4 datasets × 10 seeds × (1 + 5 methods × 3 ratios) = **640 training runs**.
