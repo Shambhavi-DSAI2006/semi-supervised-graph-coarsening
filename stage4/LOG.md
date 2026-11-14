@@ -15,3 +15,9 @@ Every experiment, including failed or abandoned ones, newest last. Dates are loc
 
   "Lost" = training labels outvoted inside a super-node. Loukas reaches 1%; it overshoots the target slightly, so M7's count is matched to M4's achieved count, not to the nominal target. Loukas on PubMed takes 20–77 s per run.
 - Wrote [PROTOCOL.md](PROTOCOL.md) before producing any Stage 4 result.
+
+## 2026-11-14 — Implementation and development checks
+
+- `stage4/run.py` reuses Stage 2's code; adds random splits per seed, Loukas + label separation (M7) and clash statistics.
+- **Equivalence check:** Loukas's coarse edge weights equal the number of original edges between two super-nodes in every case (Cora, ratio 0.05), so M7 rebuilds its edges by counting crossing edges and stays identical to M4 apart from the separation rule.
+- **Development run** (Cora, Citeseer, PubMed at 1% only; seed 99; validation accuracy only, test accuracy never computed): every method keeps all nodes; M7 loses **0** training labels in every cell (plain Loukas loses up to 62 on Cora) and matches M4's super-node count within 2% (largest gap: +3 on Citeseer at 1%). SGBGC-keep also loses labels at small budgets (e.g. Cora 1%: 48), because its budget runs out before all training nodes are separated. One seed takes ~4 min for Cora+Citeseer and ~2 min per ratio on PubMed.
