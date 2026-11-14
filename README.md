@@ -16,8 +16,9 @@ Real graphs are usually labelled sparsely; standard semi-supervised benchmarks g
 |---|---|---|
 | 1. Reproduce | Reproduce SGBGC's main results with the authors' code | Done: [reproduction/](reproduction/) |
 | 2. Diagnose | Measure how label-aware coarsening behaves as labels become scarce | Done: **pivot** - [`stage2/`](stage2/) |
-| 3. Method | Design a coarsening method that uses sparse labels and unlabelled structure | Planned |
-| 4. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
+| 3. Headroom | Measure how much labels could add to coarsening at strong compression and on heterophilous graphs | Done: weak target (one cell) - [`stage3/`](stage3/) |
+| 4. Method | Design a coarsening method that uses sparse labels and unlabelled structure | Next: confirm the target first |
+| 5. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
 
 ## Stage 1 at a glance
 
@@ -27,10 +28,15 @@ SGBGC's results reproduce on Cora, Citeseer and Co-CS, but only with the code's 
 
 Pre-registered test on Cora and Citeseer at 5-20 labels per class. SGBGC's collapse under label scarcity comes from discarding unlabelled nodes; keeping them recovers 4-7 points. But once nothing is discarded, label-aware coarsening is no better than label-free coarsening (Loukas/SCAL) with the same training, so the pre-registered rule says **pivot**: the project needs a different angle on semi-supervised coarsening. Details and candidate directions: [`stage2/README.md`](stage2/README.md).
 
+## Stage 3 at a glance
+
+Pre-registered headroom test on Cora, Citeseer, Roman-empire and Amazon-ratings at 10%, 5% and 2% of nodes with 20 labels per class. Even with many labels, granular-ball coarsening beat label-free coarsening by 3+ points in only one setting (Cora at 2%), with weak evidence; the heterophilous graphs were too hard for the base GCN to be informative. An exploratory hint: at strong compression, keeping the few labelled nodes apart may matter more than having many labels. Details: [`stage3/README.md`](stage3/README.md).
+
 ## Repository layout
 
 - **reproduction/**: Stage 1, the SGBGC reproduction (scripts, raw results, tables, figures)
 - **stage2/**: Stage 2, the label-scarcity test (protocol, log, code, results)
+- **stage3/**: Stage 3, the headroom test (protocol, log, code, results)
 
 ## Key references
 
