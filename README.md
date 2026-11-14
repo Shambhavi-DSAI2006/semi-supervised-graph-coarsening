@@ -18,8 +18,9 @@ Real graphs are usually labelled sparsely; standard semi-supervised benchmarks g
 | 2. Diagnose | Measure how label-aware coarsening behaves as labels become scarce | Done: **pivot** - [`stage2/`](stage2/) |
 | 3. Headroom | Measure how much labels could add to coarsening at strong compression and on heterophilous graphs | Done: weak target (one cell) - [`stage3/`](stage3/) |
 | 4. Label separation | Test one method component: never merge training nodes of different classes | Done: **go**, modest evidence - [`stage4/`](stage4/) |
-| 5. Method | Protect training labels without taking budget from the rest of the graph | Next |
-| 6. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
+| 5. General wrapper | Test label protection as a plug-in for any coarsening method | Done: **inconclusive, not general** - [`stage5/`](stage5/) |
+| 6. Method | Choose the next direction with the supervisor (see stage5/LOG.md) | Next |
+| 7. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
 
 ## Stage 1 at a glance
 
@@ -37,12 +38,17 @@ Pre-registered headroom test on Cora, Citeseer, Roman-empire and Amazon-ratings 
 
 Pre-registered test of one semi-supervised rule added to Loukas/SCAL coarsening: never let a super-node contain training nodes of more than one class. On new seeds and splits it passed the rule on Cora (+3.0 points on average) and PubMed (+2.0, narrowly), not on Citeseer; the largest, robust effect is Cora at 2% of nodes (+6 points). The rule costs budget elsewhere and can hurt when that cost is high, which points to the next design step. Details: [`stage4/README.md`](stage4/README.md).
 
+## Stage 5 at a glance
+
+Pre-registered test of a general "label protection" wrapper (split super-nodes that mix training labels, then rebalance to the same size) on three different coarsening methods. It is not general: it helps a weak structural coarsener (GB-struct, +3 to +4 points), barely changes Loukas, and hurts feature k-means (-2 points on Cora). Exploratory: plain k-means on smoothed features was the most accurate of the three base methods at every compression level. Details: [`stage5/README.md`](stage5/README.md).
+
 ## Repository layout
 
 - **reproduction/**: Stage 1, the SGBGC reproduction (scripts, raw results, tables, figures)
 - **stage2/**: Stage 2, the label-scarcity test (protocol, log, code, results)
 - **stage3/**: Stage 3, the headroom test (protocol, log, code, results)
 - **stage4/**: Stage 4, the label-separation test (protocol, log, code, results)
+- **stage5/**: Stage 5, the general label-protection wrapper test (protocol, log, code, results)
 
 ## Key references
 
