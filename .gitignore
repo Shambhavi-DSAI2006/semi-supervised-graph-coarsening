@@ -19,3 +19,5 @@ venv/
 stage2/third_party/
 stage2/results/smoke.jsonl
 stage2/dataset
+stage3/dataset
+stage3/results/smoke.jsonl

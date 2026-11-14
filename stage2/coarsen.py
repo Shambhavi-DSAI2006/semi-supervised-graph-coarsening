@@ -102,12 +102,16 @@ def _split_further_guarded(g, graph, id_dict, C, tdd, total):
     return C
 
 
-def sgbgc(edge_index, n, y_known, ratio, keep=False):
+def sgbgc(edge_index, n, y_known, ratio, keep=False, y_second=None):
     """SGBGC partition (authors' gb_division up to purification).
 
     y_known: int array, class for known training labels, -1 otherwise.
     keep=False -> M2 (as released + crash guard); keep=True -> M3 (SGBGC-keep).
     With all labels -1 and keep=True -> M5 (GB-struct).
+    y_second (Stage 3, O-sep): after purity splitting on y_known, relabel every node
+    with y_second and continue purity splitting until the budget is reached.
+    keep=True also reattaches any node the authors' pruning step deleted to the ball
+    of its nearest covered node (Stage 3 Amendment 1; never triggered in Stage 2).
     Node features are not used by SGBGC's partitioning, so a 1-column placeholder
     is passed to keep the per-row arrays small.
     """
@@ -161,14 +165,39 @@ def sgbgc(edge_index, n, y_known, ratio, keep=False):
         ball.append(float(n_maj / n_lab) if n_lab else 1.0)
 
     new_C = g["sbp"].split_ball_purity(graph, id_dict, new_C, tdd, total)
+    if y_second is not None:                       # O-sep second phase: continue on y_second
+        data[:, -2] = np.asarray(y_second)[data[:, 0].astype(np.int64)]   # ball rows are views of data
+        for ball in new_C:
+            maj = g["find_major"](ball[0])
+            n_maj, n_lab = g["find_major_num"](ball[0], maj)
+            ball[-1] = float(n_maj / n_lab) if n_lab else 1.0
+        new_C = g["sbp"].split_ball_purity(graph, id_dict, new_C, tdd, total)
     if len(new_C) < total:
         new_C = _split_further_guarded(g, graph, id_dict, new_C, tdd, total)
 
     groups = [np.array([int(r[0]) for r in b[0]], dtype=np.int64) for b in new_C]
-    if keep:
+    reattached = 0
+    if keep:                                       # reattach nodes deleted by pruning
+        owner = {int(v): b for b, gr in enumerate(groups) for v in gr}
+        missing = [v for v in graph.nodes() if v not in owner]
+        if missing:
+            reattached = len(missing)
+            frontier = list(owner)
+            seen = set(owner)
+            while frontier:
+                nxt = []
+                for u in frontier:
+                    for w in graph.neighbors(u):
+                        if w not in seen:
+                            seen.add(w); owner[w] = owner[u]; nxt.append(w)
+                frontier = nxt
+            members = {}
+            for v, b in owner.items():
+                members.setdefault(b, []).append(v)
+            groups = [np.array(sorted(members[b]), dtype=np.int64) for b in sorted(members)]
         groups += [np.array([v], dtype=np.int64) for v in isolated]
     impure = sum(1 for b in new_C if b[2] < 1.0)
-    return Partition(groups, "binary", info=dict(pruned=pruned, impure_balls=impure))
+    return Partition(groups, "binary", info=dict(pruned=pruned, impure_balls=impure, reattached=reattached))
 
 
 # --------------------------------------------------------------------------- Loukas (M4)
@@ -273,7 +302,7 @@ COARSE_METHODS = ["sgbgc", "sgbgc_keep"] + LABEL_FREE
 SMALL = 10   # components with <= SMALL nodes (incl. isolated nodes) become one super-node each
 
 
-def _on_large_components(fn, data, train_mask, ratio):
+def _on_large_components(fn, data, train_mask, ratio, second_mask=None):
     """Amendment 1 (PROTOCOL.md): every small component becomes one super-node, identically
     for M3-M6; the method runs on the subgraph of large components with the ratio applied
     to that subgraph's nodes."""
@@ -288,7 +317,11 @@ def _on_large_components(fn, data, train_mask, ratio):
 
     sub_ei, _ = subgraph(torch.as_tensor(large), data.edge_index, relabel_nodes=True, num_nodes=n)
     y_known = np.where(train_mask.numpy(), data.y.numpy(), -1)[large]
-    part = fn(sub_ei, len(large), data.x[large], y_known, ratio)
+    if second_mask is None:
+        part = fn(sub_ei, len(large), data.x[large], y_known, ratio)
+    else:
+        y_second = np.where(second_mask.numpy(), data.y.numpy(), -1)[large]
+        part = fn(sub_ei, len(large), data.x[large], y_known, ratio, y_second)
 
     part.groups = [large[g] for g in part.groups] + small_groups
     if part.edge_mode == "explicit":                 # small components: no edges to anything
@@ -297,7 +330,7 @@ def _on_large_components(fn, data, train_mask, ratio):
     return part
 
 
-def run_method(name, data, train_mask, ratio, seed):
+def run_method(name, data, train_mask, ratio, seed, second_mask=None):
     n = data.num_nodes
     if name == "sgbgc":                              # M2: as released, whole graph
         y_known = np.where(train_mask.numpy(), data.y.numpy(), -1)
@@ -307,7 +340,9 @@ def run_method(name, data, train_mask, ratio, seed):
         "gb_struct": lambda ei, m, x, yk, r: sgbgc(ei, m, np.full(m, -1), r, keep=True),
         "loukas": lambda ei, m, x, yk, r: loukas(ei, m, r),
         "feat_cluster": lambda ei, m, x, yk, r: feature_clusters(ei, x, r, seed),
+        # Stage 3 O-sep: purity on train labels first, then on second_mask's labels
+        "sgbgc_keep_sep": lambda ei, m, x, yk, r, y2: sgbgc(ei, m, yk, r, keep=True, y_second=y2),
     }
     if name not in fns:
         raise ValueError(name)
-    return _on_large_components(fns[name], data, train_mask, ratio)
+    return _on_large_components(fns[name], data, train_mask, ratio, second_mask)
