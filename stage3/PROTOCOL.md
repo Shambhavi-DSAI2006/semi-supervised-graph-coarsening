@@ -90,3 +90,13 @@ For each of the 12 (dataset, ratio) cells, compute H and G with 95% confidence i
 3. **Keep-every-node fix:** in SGBGC-keep (and both oracles), nodes deleted by the authors' pruning step are reattached to the ball of their nearest covered node (multi-source BFS). This step never triggered in Stage 2; a regression check confirmed that the changed code reproduces the Stage 2 partitions exactly (18 of 18 cases).
 
 **Resulting size:** 4 datasets × 10 seeds × (1 + 5 methods × 3 ratios) = **640 training runs**.
+
+### Amendment 2 — bug fix made after the test results existed (2026-11-14)
+
+**This amendment was made after test-set results had been computed; both versions are reported.**
+
+**Reason.** The completeness check after the main run found that 12 of 640 runs — all on Citeseer at ratio 0.02 (all 10 oracle-O runs, 1 SGBGC-keep run, 1 O-sep run) — lost 24 nodes (0.7% of Citeseer). At that budget the authors' pruning step deleted *every* ball of a few small separate components, and Amendment 1's reattachment can only grow from a surviving ball in the same component.
+
+**Change.** A component left with no covered node becomes one ball, as any label-free component already does. The 30 runs of the three affected Citeseer 0.02 cells were rerun with the fix (`results/results_fix.jsonl`); all now keep every node. The original runs remain in `results/results_c.jsonl`; the analysis uses the newest record per run.
+
+**Effect on the decision: none.** Citeseer 0.02: H = +1.36 before and +1.34 after the fix; G = −0.58 in both. The decision ("target found" in Cora at 2% only) is the same with either version.
