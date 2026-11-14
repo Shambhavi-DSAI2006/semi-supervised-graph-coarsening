@@ -10,3 +10,8 @@ Every experiment, including failed or abandoned ones, newest last. Dates are loc
   - On Loukas, GB-struct and k-means over Cora, Citeseer and PubMed at 5%, 2%, 1%: protection always returned exactly the input number of super-nodes, kept every node, and reduced lost training labels to 0 (from up to 60 for Loukas and GB-struct and 22 for k-means on Cora). It takes under 0.1 s per partition, versus re-running Loukas (up to 77 s on PubMed) in Stage 4.
   - **Dropped as base methods:** Stage 2's feature clustering with connectivity splitting could not control its size (PubMed: 1,227 instead of 985 super-nodes at 5%, **1** instead of 197 at 1%); heavy-edge matching (Loukas library) stalled at 412 super-nodes on Cora for every target (101–201) and did not finish on PubMed within 15 minutes. Plain feature k-means hits every target exactly and was chosen as the third, structure-free family.
 - Wrote [PROTOCOL.md](PROTOCOL.md) before producing any Stage 5 result.
+
+## 2026-11-14 — Implementation check
+
+- `stage5/run.py` reuses Stage 2's code and Stage 4's split and separation helpers.
+- **Development run** (Cora, seed 99, validation accuracy only, test accuracy never computed; 1.5 min): all 7 coarsened methods ran at 5%, 2%, 1%; every protected partition kept all nodes, had exactly the base method's super-node count, and lost 0 training labels (base methods lost 14–64). Stage 4's separation-with-re-run again missed its size at 1% (113 vs 104), as in Stage 4.

@@ -23,3 +23,5 @@ stage3/dataset
 stage3/results/smoke.jsonl
 stage4/dataset
 stage4/results/smoke.jsonl
+stage5/dataset
+stage5/results/smoke.jsonl
