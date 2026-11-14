@@ -19,8 +19,9 @@ Real graphs are usually labelled sparsely; standard semi-supervised benchmarks g
 | 3. Headroom | Measure how much labels could add to coarsening at strong compression and on heterophilous graphs | Done: weak target (one cell) - [`stage3/`](stage3/) |
 | 4. Label separation | Test one method component: never merge training nodes of different classes | Done: **go**, modest evidence - [`stage4/`](stage4/) |
 | 5. General wrapper | Test label protection as a plug-in for any coarsening method | Done: **inconclusive, not general** - [`stage5/`](stage5/) |
-| 6. Method | Choose the next direction with the supervisor (see stage5/LOG.md) | Next |
-| 7. Evaluate | Compare against supervised and unsupervised coarsening at realistic label rates and scales | Planned |
+| 6. Label-guided k-means | Test whether few labels improve feature k-means coarsening | Done: **inconclusive** (helps PubMed only) - [`stage6/`](stage6/) |
+| 7. Baseline gap | Compare against CGC, LAGC, SCAL, SGBGC, Bonsai at very few labels and on large graphs | Next |
+| 8. Method and evaluation | Build and fully evaluate the method in the gap found | Planned |
 
 ## Stage 1 at a glance
 
@@ -42,6 +43,10 @@ Pre-registered test of one semi-supervised rule added to Loukas/SCAL coarsening:
 
 Pre-registered test of a general "label protection" wrapper (split super-nodes that mix training labels, then rebalance to the same size) on three different coarsening methods. It is not general: it helps a weak structural coarsener (GB-struct, +3 to +4 points), barely changes Loukas, and hurts feature k-means (-2 points on Cora). Exploratory: plain k-means on smoothed features was the most accurate of the three base methods at every compression level. Details: [`stage5/README.md`](stage5/README.md).
 
+## Stage 6 at a glance
+
+Pre-registered test of label guidance for feature k-means coarsening. Label-propagation features helped on PubMed (+2.0 points, matching the full graph at 1-2% of nodes) but not clearly on Cora or Citeseer. A literature check during this stage found closely related published methods (LAGC, CGC, Bonsai), which are now required baselines. Details: [`stage6/README.md`](stage6/README.md).
+
 ## Repository layout
 
 - **reproduction/**: Stage 1, the SGBGC reproduction (scripts, raw results, tables, figures)
@@ -49,6 +54,7 @@ Pre-registered test of a general "label protection" wrapper (split super-nodes t
 - **stage3/**: Stage 3, the headroom test (protocol, log, code, results)
 - **stage4/**: Stage 4, the label-separation test (protocol, log, code, results)
 - **stage5/**: Stage 5, the general label-protection wrapper test (protocol, log, code, results)
+- **stage6/**: Stage 6, the label-guided k-means test (protocol, log, code, results)
 
 ## Key references
 
