@@ -191,6 +191,15 @@ def sgbgc(edge_index, n, y_known, ratio, keep=False, y_second=None):
                         if w not in seen:
                             seen.add(w); owner[w] = owner[u]; nxt.append(w)
                 frontier = nxt
+            # a component whose balls were all pruned has no covered node to grow from:
+            # it becomes one ball, like any other label-free component (Stage 3 Amendment 2)
+            next_b = len(groups)
+            for comp in nx.connected_components(graph):
+                rest = [v for v in comp if v not in owner]
+                if rest:
+                    for v in rest:
+                        owner[v] = next_b
+                    next_b += 1
             members = {}
             for v, b in owner.items():
                 members.setdefault(b, []).append(v)
